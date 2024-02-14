@@ -1,0 +1,12 @@
+addu-workspaces-path: /home/daiego/PycharmProjects/ADDU/ADDU-workspaces
+supported-editors:
+  - pycharm-comunity
+  - pycharm-professional
+  - vscode
+ros-distros:
+  noetic:
+    - osrf/ros:noetic-desktop-full
+    - ros:noetic-ros-base
+  humble:
+    - osrf/ros:humble-desktop-full
+    - ros:humble-ros-base

@@ -8,6 +8,7 @@ RUN groupadd --gid $GID $USER && \\
     echo "$USER:$USER" | chpasswd && \\
     usermod -aG sudo $USER && \\
     echo "$USER ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/$USER 
+RUN mkdir -p /home/$USER/share
     """
     return snippet
 
@@ -15,8 +16,13 @@ RUN groupadd --gid $GID $USER && \\
 def source_ros_in_user(user, ros_version):
     snippet = f"""
 RUN echo "source /opt/ros/{ros_version}/setup.bash" >> /home/{user}/.bashrc
-RUN echo "source /home/{user}/ros_ws/install/setup.bash" >> /home/{user}/.bashrc
+RUN echo "source /home/{user}/share/ros_ws/install/setup.bash" >> /home/{user}/.bashrc
     """
+    if ros_version == "noetic":
+        snippet = f"""
+RUN echo "source /opt/ros/{ros_version}/setup.bash" >> /home/{user}/.bashrc
+RUN echo "source /home/{user}/share/ros_ws/devel/setup.bash" >> /home/{user}/.bashrc
+"""
     return snippet
 
 
@@ -52,7 +58,7 @@ RUN apt-get install -y \\
     return snippet
 
 
-def install_code_editor(editor, download=False):
+def install_code_editor(editor):
     snippet = None
     match editor:
         case "vscode":
@@ -62,22 +68,22 @@ RUN wget -q https://packages.microsoft.com/keys/microsoft.asc -O- | apt-key add 
     && apt-get update \\
     && apt-get install -y code\n
             """
-        case "pycharm":
-            if download:
-                snippet = f"""
-RUN wget -q https://download.jetbrains.com/python/pycharm-professional-2022.1.tar.gz -O /tmp/pycharm.tar.gz\n
-                """
-            else:
-                snippet = f"""
-COPY pycharm-community-2023.3.3.tar.gz /tmp/pycharm.tar.gz\n
-                """
-
-            snippet += f"""
+        case "pycharm-professional":
+            snippet = f"""
+RUN wget -q https://download.jetbrains.com/python/pycharm-professional-2023.3.3.tar.gz -O /tmp/pycharm.tar.gz\n
 RUN tar -xzf /tmp/pycharm.tar.gz -C /opt/ \\
     && rm /tmp/pycharm.tar.gz
 ENV PYCHARM_HOME /opt/pycharm-community-2023.3.3
 ENV PATH $PYCHARM_HOME/bin:$PATH\n
             """
+        case "pycharm-comunity":
+            snippet = f"""
+RUN wget -q https://download.jetbrains.com/python/pycharm-comunity-2023.3.3.tar.gz -O /tmp/pycharm.tar.gz\n
+RUN tar -xzf /tmp/pycharm.tar.gz -C /opt/ \\
+    && rm /tmp/pycharm.tar.gz
+ENV PYCHARM_HOME /opt/pycharm-community-2023.3.3
+ENV PATH $PYCHARM_HOME/bin:$PATH\n
+"""
     return snippet
 
 
