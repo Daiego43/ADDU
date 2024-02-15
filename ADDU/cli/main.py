@@ -40,7 +40,3 @@ def main():
             main()
         case 'exit':
             console.print("[bold green]Goodbye![/bold green]")
-
-
-if __name__ == '__main__':
-    main()

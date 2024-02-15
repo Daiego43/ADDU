@@ -57,7 +57,7 @@ class CreateWorkspace:
 
     def build_image(self, debug=True):
         build_path = str(os.path.join(CONFIG["addu-workspaces-path"], self.ws_name))
-
+        print(build_path)
         response = DOCKER_CLIENT.build(path=build_path, tag=self.new_image, decode=True)
         self.console.print(f"[bold blue]Building image...[/bold blue]", end="")
         win = True
