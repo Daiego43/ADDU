@@ -35,7 +35,7 @@ setup(
     python_requires='>=3.10',
     entry_points={
         'console_scripts': [
-            'addu = ADDU.__main__:main'
+            'addu=ADDU.__main__:main'
         ],
     },
 )
