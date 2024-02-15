@@ -1,6 +1,7 @@
-addu-workspaces-path: /home/daiego/PycharmProjects/ADDU/ADDU-workspaces
+addu-editors-path: /home/diego/PycharmProjects/ADDU/editors
+addu-workspaces-path: /home/diego/PycharmProjects/ADDU/workspaces
 supported-editors:
-  - pycharm-comunity
+  - pycharm-community
   - pycharm-professional
   - vscode
 ros-distros:

@@ -30,12 +30,12 @@ def install_packages(packages_list):
     snippet = f"""
 RUN apt-get update && \\
     apt-get install -y \\
-    """
+"""
     for pkg in packages_list:
         if packages_list[-1] == pkg:
-            snippet += f"   {pkg} \n"
+            snippet += f"    {pkg}"
         else:
-            snippet += f"   {pkg} \\ \n"
+            snippet += f"    {pkg} \\\n"
     return snippet
 
 
@@ -58,38 +58,8 @@ RUN apt-get install -y \\
     return snippet
 
 
-def install_code_editor(editor):
-    snippet = None
-    match editor:
-        case "vscode":
-            snippet = f"""
-RUN wget -q https://packages.microsoft.com/keys/microsoft.asc -O- | apt-key add - \\
-    && add-apt-repository "deb [arch=amd64] https://packages.microsoft.com/repos/vscode stable main" \\
-    && apt-get update \\
-    && apt-get install -y code\n
-            """
-        case "pycharm-professional":
-            snippet = f"""
-RUN wget -q https://download.jetbrains.com/python/pycharm-professional-2023.3.3.tar.gz -O /tmp/pycharm.tar.gz\n
-RUN tar -xzf /tmp/pycharm.tar.gz -C /opt/ \\
-    && rm /tmp/pycharm.tar.gz
-ENV PYCHARM_HOME /opt/pycharm-community-2023.3.3
-ENV PATH $PYCHARM_HOME/bin:$PATH\n
-            """
-        case "pycharm-comunity":
-            snippet = f"""
-RUN wget -q https://download.jetbrains.com/python/pycharm-comunity-2023.3.3.tar.gz -O /tmp/pycharm.tar.gz\n
-RUN tar -xzf /tmp/pycharm.tar.gz -C /opt/ \\
-    && rm /tmp/pycharm.tar.gz
-ENV PYCHARM_HOME /opt/pycharm-community-2023.3.3
-ENV PATH $PYCHARM_HOME/bin:$PATH\n
-"""
-    return snippet
-
-
 def share_devices():
     snippet = f"""
 VOLUME /dev:/dev\n
     """
     return snippet
-
