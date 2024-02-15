@@ -1,11 +1,12 @@
 import os
+import shutil
 import time
 
 import docker
-import yaml
 import rich
+import yaml
+
 from ADDU.logic import docker_snippets as ds
-import shutil
 
 DOCKER_CLIENT = docker.APIClient(base_url='unix://var/run/docker.sock')
 CONFIG = yaml.load(open("ADDU/config/config.yaml", "r"), Loader=yaml.FullLoader)
