@@ -54,20 +54,21 @@ class CreateWorkspace:
             dockerfile.writelines(lines)
         self.console.print(f"[bold green] Done![/bold green]")
 
-    def build_image(self):
+    def build_image(self, debug=True):
         build_path = str(os.path.join(CONFIG["addu-workspaces-path"], self.ws_name))
 
         response = DOCKER_CLIENT.build(path=build_path, tag=self.new_image, decode=True)
         self.console.print(f"[bold blue]Building image...[/bold blue]", end="")
         win = True
-        for line in response:
-            if 'stream' in line:
-                # print(line['stream'].strip())
-                pass
-            if 'error' in line:
-                self.console.print("Error:", line['error'].strip(), style="bold red")
-                win = False
-                break
+        if debug:
+            for line in response:
+                if 'stream' in line:
+                    print(line['stream'].strip())
+                    pass
+                if 'error' in line:
+                    self.console.print("Error:", line['error'].strip(), style="bold red")
+                    win = False
+                    break
         if win:
             self.console.print(f"[bold green] Done![/bold green]")
 
@@ -127,6 +128,8 @@ class EditorDownloader:
         self.editor = editor
         self.console = console
         self.editors_path = CONFIG["addu-editors-path"]
+        if not os.path.exists(CONFIG["addu-editors-path"]):
+            os.makedirs(CONFIG["addu-editors-path"])
         if not self.downloaded():
             self.download_editor()
         else:
