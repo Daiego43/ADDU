@@ -29,8 +29,8 @@ setup(
         'urllib3==2.2.0',
     ],
     classifiers=[
-        'Programming Language :: Python :: 3',
-        'Operating System :: Ubuntu 22',
+        'Programming Language :: Python :: 3.10',
+        'Operating System :: POSIX :: Linux',
     ],
     python_requires='>=3.10',
     entry_points={

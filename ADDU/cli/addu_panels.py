@@ -11,7 +11,7 @@ from logic.addu_docker_factory import delete_ws
 
 CONFIG = yaml.load(open("config/config.yaml", "r"), Loader=yaml.FullLoader)
 if not os.path.exists(CONFIG["addu-workspaces-path"]):
-    os.mkdir(CONFIG["addu-workspaces-path"])
+    os.makedirs(CONFIG["addu-workspaces-path"])
 
 
 def about_panel():
