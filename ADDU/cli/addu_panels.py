@@ -7,9 +7,9 @@ from rich.panel import Panel
 from rich.prompt import Prompt
 from rich.text import Text
 from rich.table import Table
-from ADDU.logic.addu_docker_factory import delete_ws
+from logic.addu_docker_factory import delete_ws
 
-CONFIG = yaml.load(open("ADDU/config/config.yaml", "r"), Loader=yaml.FullLoader)
+CONFIG = yaml.load(open("config/config.yaml", "r"), Loader=yaml.FullLoader)
 if not os.path.exists(CONFIG["addu-workspaces-path"]):
     os.mkdir(CONFIG["addu-workspaces-path"])
 

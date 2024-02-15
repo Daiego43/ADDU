@@ -6,10 +6,10 @@ import docker
 import rich
 import yaml
 
-from ADDU.logic import docker_snippets as ds
+from logic import docker_snippets as ds
 
 DOCKER_CLIENT = docker.APIClient(base_url='unix://var/run/docker.sock')
-CONFIG = yaml.load(open("ADDU/config/config.yaml", "r"), Loader=yaml.FullLoader)
+CONFIG = yaml.load(open("config/config.yaml", "r"), Loader=yaml.FullLoader)
 
 
 class CreateWorkspace:
@@ -34,11 +34,11 @@ class CreateWorkspace:
 
     def create_workspace(self):
         os.chdir(CONFIG["addu-workspaces-path"])
-        os.system(f"mkdir -p {self.ws_name}/share")
-        os.system(f"mkdir -p {self.ws_name}/config")
-        os.system(f"mkdir -p {self.ws_name}/local")
-        os.system(f"mkdir -p {self.ws_name}/cache")
-        os.system(f"mkdir -p {self.ws_name}/java")
+        os.system(f"mkdir -p {self.ws_name}/editor-settings/share")
+        os.system(f"mkdir -p {self.ws_name}/editor-settings/config")
+        os.system(f"mkdir -p {self.ws_name}/editor-settings/local")
+        os.system(f"mkdir -p {self.ws_name}/editor-settings/cache")
+        os.system(f"mkdir -p {self.ws_name}/editor-settings/java")
         os.chdir(self.ws_name)
 
     def create_dockerfile(self):
@@ -106,10 +106,10 @@ class CreateWorkspace:
             f"--volume /dev:/dev "
             f"--volume {self.ws_path}/share:/home/{self.user}/share "
             f"--volume {editor_path}:/home/{self.user}/editor "
-            f"--volume {self.ws_path}/config:/home/{self.user}/.config "
-            f"--volume {self.ws_path}/cache:/home/{self.user}/.cache "
-            f"--volume {self.ws_path}/local:/home/{self.user}/.local "
-            f"--volume {self.ws_path}/java:/home/{self.user}/.java "
+            f"--volume {self.ws_path}/editor-settings/config:/home/{self.user}/.config "
+            f"--volume {self.ws_path}/editor-settings/cache:/home/{self.user}/.cache "
+            f"--volume {self.ws_path}/editor-settings/local:/home/{self.user}/.local "
+            f"--volume {self.ws_path}/editor-settings/java:/home/{self.user}/.java "
             f"--network host "
             f"--rm "
             f"{self.new_image} "

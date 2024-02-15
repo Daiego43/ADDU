@@ -1,9 +1,9 @@
 from rich.console import Console
 from rich.prompt import Prompt
-import os
-from ADDU.cli.addu_panels import option_panel, about_panel, workspace_creation_panel, list_workspaces, delete_workspace, \
-    run_workspace
-from ADDU.logic import addu_docker_factory as dof
+
+from cli.addu_panels import (option_panel, about_panel, workspace_creation_panel,
+                             list_workspaces, delete_workspace, run_workspace)
+from logic import addu_docker_factory as dof
 
 
 def main():
