@@ -21,7 +21,7 @@ RUN groupadd --gid $GID $USER && \\
     echo "$USER:$USER" | chpasswd && \\
     usermod -aG sudo $USER && \\
     echo "$USER ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/$USER 
-RUN mkdir -p /home/$USER/share
+RUN mkdir -p /home/$USER/shared
     """
     return snippet
 
@@ -40,24 +40,23 @@ RUN echo "source /home/{user}/shared/ros_ws/devel/setup.bash" >> /home/{user}/.b
 
 
 def install_editor(editor):
-    snippet = f""""""
     if editor == "vscode":
         snippet = f"""
 RUN wget -O vscode.tar.gz https://update.code.visualstudio.com/latest/linux-x64/stable
-RUN tar -xvf vscode.tar.gz -C /opt/vscode
-RUN ln -s /opt/vscode/bin/code /usr/local/bin/code
+RUN tar -xvf vscode.tar.gz -C /opt
+ENV PATH="/opt/VSCode-linux-x64:${{PATH}}"
     """
     if editor == "pycharm-professional":
         snippet = f"""
-RUN wget -q https://download.jetbrains.com/python/pycharm-professional-2023.3.3.tar.gz"
-RUN tar -xvf pycharm-2023.3.3.tar.gz -C /opt/pycharm
-RUN ln -s /opt/pycharm/bin/pycharm.sh /usr/local/bin/pycharm
+RUN wget -q https://download.jetbrains.com/python/pycharm-2023.3.3.tar.gz"
+RUN tar -xvf pycharm-2023.3.3.tar.gz -C /opt
+ENV PATH="/opt/pycharm-2023.3.3/bin:${{PATH}}"
 """
     if editor == "pycharm-community":
         snippet = f"""
 RUN wget -q https://download.jetbrains.com/python/pycharm-community-2023.3.3.tar.gz
-RUN tar -xvf pycharm-2023.3.3.tar.gz -C /opt/pycharm
-RUN ln -s /opt/pycharm/bin/pycharm.sh /usr/local/bin/pycharm
+RUN tar -xvf pycharm-community-2023.3.3.tar.gz -C /opt
+ENV PATH="/opt/pycharm-community-2023.3.3/bin:${{PATH}}"
 """
     return snippet
 
@@ -77,5 +76,3 @@ RUN apt-get install -y \\
     libgtk-3-0\n
     """
     return snippet
-
-

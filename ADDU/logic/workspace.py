@@ -103,7 +103,7 @@ class Workspace:
 
 
 if __name__ == '__main__':
-    w = Workspace("test", "test", "noetic", "ros:noetic", "code")
+    w = Workspace("test", "test", "noetic", "ros:noetic", "pycharm-professional")
     w.create_workspace()
     w.build_image()
     w.run_workspace_docker()
