@@ -9,7 +9,11 @@ from rich.text import Text
 from rich.table import Table
 from logic.addu_docker_factory import delete_ws
 
-CONFIG = yaml.load(open("config/config.yaml", "r"), Loader=yaml.FullLoader)
+from pathlib import Path
+
+config_path = Path("config") / "config.yaml"
+
+CONFIG = yaml.load(open(config_path, "r"), Loader=yaml.FullLoader)
 if not os.path.exists(CONFIG["addu-workspaces-path"]):
     os.makedirs(CONFIG["addu-workspaces-path"])
 

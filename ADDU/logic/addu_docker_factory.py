@@ -24,10 +24,10 @@ class CreateWorkspace:
         self.ws_path = CONFIG["addu-workspaces-path"] + "/" + self.ws_name
 
     def setup_ws(self):
+        self.create_workspace_config()
         self.create_workspace()
         self.create_dockerfile()
         self.build_image()
-        self.create_workspace_config()
         ed = EditorDownloader(self.editor, self.console)
         ed.extract_editor(self.ws_path)
         self.create_startup()
@@ -103,7 +103,8 @@ class CreateWorkspace:
             f"--user {self.user} "
             f"--workdir /home/{self.user} "
             f"--env DISPLAY=$DISPLAY "
-            f"--volume /dev:/dev "
+            f"--volume /dev:/dev:rw"
+            f"--volume /tmp/.X11-unix:/tmp/.X11-unix:rw "
             f"--volume {self.ws_path}/share:/home/{self.user}/share "
             f"--volume {editor_path}:/home/{self.user}/editor "
             f"--volume {self.ws_path}/editor-settings/config:/home/{self.user}/.config "
@@ -115,26 +116,19 @@ class CreateWorkspace:
             f"{self.new_image} "
             f"{command}"
         )
-
-        # Escribir el comando en el archivo startup.bash
-        os.chdir(self.ws_path)
-        print(os.curdir)
         with open("startup.bash", "w") as file:
             file.write("#!/bin/bash\n")
             file.write(comando_docker_run + "\n")
 
 
 class EditorDownloader:
-    def __init__(self, editor, console=rich.console.Console()):
+    def __init__(self, editor):
         self.editor = editor
-        self.console = console
         self.editors_path = CONFIG["addu-editors-path"]
         if not os.path.exists(CONFIG["addu-editors-path"]):
             os.makedirs(CONFIG["addu-editors-path"])
-        if not self.downloaded():
-            self.download_editor()
-        else:
-            self.console.print(f"[bold green]{editor} already downloaded[/bold green]")
+
+        self.download_editor()
 
     def downloaded(self):
         match self.editor:
@@ -149,18 +143,13 @@ class EditorDownloader:
         os.chdir(self.editors_path)
         match self.editor:
             case "vscode":
-                self.console.print("[bold blue]Downloading Visual Studio Code...[/bold blue]")
                 os.system("wget -O vscode.tar.gz https://update.code.visualstudio.com/latest/linux-x64/stable")
             case "pycharm-professional":
-                self.console.print("[bold blue]Downloading Pycharm Professional...[/bold blue]")
                 os.system("wget -q https://download.jetbrains.com/python/pycharm-professional-2023.3.3.tar.gz")
             case "pycharm-community":
-                self.console.print("[bold blue]Downloading Pycharm Comunity...[/bold blue]")
                 os.system("wget -q https://download.jetbrains.com/python/pycharm-community-2023.3.3.tar.gz")
 
     def extract_editor(self, ws_path):
-        self.console.print(f"[bold blue]Extracting {self.editor}...[/bold blue]", end="")
-        os.chdir(self.editors_path)
         match self.editor:
             case "vscode":
                 os.system(f"tar -xzf vscode.tar.gz -C {ws_path}")
@@ -168,7 +157,6 @@ class EditorDownloader:
                 os.system(f"tar -xzf pycharm-professional-2023.3.3.tar.gz -C {ws_path}")
             case "pycharm-community":
                 os.system(f"tar -xzf pycharm-community-2023.3.3.tar.gz -C {ws_path}")
-        self.console.print(f"[bold green] Done![/bold green]")
         time.sleep(1)
 
 
@@ -180,4 +168,6 @@ def delete_ws(ws_name):
 
 
 if __name__ == '__main__':
-    pass
+    EditorDownloader("vscode")
+    EditorDownloader("pycharm-community")
+    EditorDownloader("pycharm-professional")
