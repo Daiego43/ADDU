@@ -1,5 +1,5 @@
-addu-editors-path: ./addu/addu-editors
-addu-workspaces-path: ./addu/addu-workspaces
+addu-workspaces-path: /home/daiego/PycharmProjects/ADDU/ADDU/addu-workspaces
+addu-editors-path: /home/daiego/PycharmProjects/ADDU/ADDU/addu-editors
 supported-editors:
   - pycharm-community
   - pycharm-professional

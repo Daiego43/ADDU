@@ -7,9 +7,13 @@ from rich.panel import Panel
 from rich.prompt import Prompt
 from rich.text import Text
 from rich.table import Table
-from logic.addu_docker_factory import delete_ws
 
-CONFIG = yaml.load(open("config/config.yaml", "r"), Loader=yaml.FullLoader)
+
+from pathlib import Path
+
+config_path = Path("config") / "config.yaml"
+
+CONFIG = yaml.load(open(config_path, "r"), Loader=yaml.FullLoader)
 if not os.path.exists(CONFIG["addu-workspaces-path"]):
     os.makedirs(CONFIG["addu-workspaces-path"])
 
@@ -77,7 +81,7 @@ def list_workspaces():
 
     for i, ws in enumerate(workspaces):
         ws_config = yaml.load(open(f"{CONFIG['addu-workspaces-path']}/{ws}/config.yaml", "r"), Loader=yaml.FullLoader)
-        table.add_row(str(i), ws, ws_config["distro"], ws_config["user"], ws_config["image"])
+        table.add_row(str(i), ws, ws_config["distro"], ws_config["user"], ws_config["base_image"])
 
     return Panel.fit(table, title=title, border_style="blue", subtitle=subtitle, padding=(1, 2))
 
@@ -89,7 +93,8 @@ def delete_workspace(console):
     if not workspaces:
         return
     i = Prompt.ask("Enter the workspace id you want to delete", choices=[str(i) for i in range(len(workspaces))])
-    delete_ws(workspaces[int(i)])
+    path = CONFIG["addu-workspaces-path"] + "/" + workspaces[int(i)]
+    shutil.rmtree(path)
 
 
 def run_workspace(console):
@@ -100,7 +105,7 @@ def run_workspace(console):
         return
     i = Prompt.ask("Enter the workspace id you want to run", choices=[str(i) for i in range(len(workspaces))])
     ws = workspaces[int(i)]
-    os.system(f"bash {CONFIG['addu-workspaces-path']}/{ws}/startup.bash")
+    os.system(f"bash {CONFIG['addu-workspaces-path']}/{ws}/startup.sh")
 
 
 if __name__ == '__main__':

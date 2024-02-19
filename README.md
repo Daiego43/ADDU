@@ -4,5 +4,5 @@ ADDU is a CLI tool for ROS dockerimages with all of
 your preferences ready to work.
 
 ```bash
-python3 ADDU 
+pip install addu 
 ```

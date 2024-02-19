@@ -35,7 +35,7 @@ setup(
     python_requires='>=3.10',
     entry_points={
         'console_scripts': [
-            'addu-cli=ADDU.cli.main:main'
+            'addu-cli=ADDU.main:addu_cli'
         ],
     },
 )
