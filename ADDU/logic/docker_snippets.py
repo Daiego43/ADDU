@@ -43,19 +43,19 @@ def install_editor(editor):
     if editor == "vscode":
         snippet = f"""
 RUN wget -O vscode.tar.gz https://update.code.visualstudio.com/latest/linux-x64/stable
-RUN tar -xvf vscode.tar.gz -C /opt
+RUN tar -xvf vscode.tar.gz -C /opt/
 ENV PATH="/opt/VSCode-linux-x64:${{PATH}}"
     """
     if editor == "pycharm-professional":
         snippet = f"""
-RUN wget -q https://download.jetbrains.com/python/pycharm-2023.3.3.tar.gz"
-RUN tar -xvf pycharm-2023.3.3.tar.gz -C /opt
+RUN wget -q "https://download.jetbrains.com/python/pycharm-professional-2023.3.3.tar.gz"
+RUN tar -xvf pycharm-professional-2023.3.3.tar.gz -C /opt/
 ENV PATH="/opt/pycharm-2023.3.3/bin:${{PATH}}"
 """
     if editor == "pycharm-community":
         snippet = f"""
 RUN wget -q https://download.jetbrains.com/python/pycharm-community-2023.3.3.tar.gz
-RUN tar -xvf pycharm-community-2023.3.3.tar.gz -C /opt
+RUN tar -xvf pycharm-community-2023.3.3.tar.gz -C /opt/
 ENV PATH="/opt/pycharm-community-2023.3.3/bin:${{PATH}}"
 """
     return snippet
@@ -63,6 +63,7 @@ ENV PATH="/opt/pycharm-community-2023.3.3/bin:${{PATH}}"
 
 def grafical_support():
     snippet = f"""
+VOLUME /tmp/.X11-unix:/tmp/.X11-unix:rw
 RUN apt-get install -y \\
     libx11-6 \\
     libxext-dev \\

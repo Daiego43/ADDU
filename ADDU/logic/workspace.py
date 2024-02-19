@@ -28,14 +28,30 @@ class Workspace:
         os.makedirs(f"{self.workspace_path}/shared", exist_ok=True)
         # Dockerfile, config.yaml and startup.sh
         self.create_dockerfile()
-        with open(f"{self.workspace_path}/config.yaml", "w"): pass
-        self.create_startup()
+        self.create_config_yaml()
+        match self.editor:
+            case "vscode":
+                self.create_startup(command="code")
+            case "pycharm-professional":
+                self.create_startup(command="pycharm.sh")
+            case "pycharm-community":
+                self.create_startup(command="pycharm.sh")
+
+    def create_config_yaml(self):
+        with open(f"{self.workspace_path}/config.yaml", "w") as config:
+            config.write(f"workspace_name: {self.workspace_name}\n")
+            config.write(f"user: {self.user}\n")
+            config.write(f"distro: {self.distro}\n")
+            config.write(f"base_image: {self.base_image}\n")
+            config.write(f"image_name: {self.image_name}\n")
+            config.write(f"container_name: {self.container_name}\n")
+            config.write(f"editor: {self.editor}\n")
 
     def create_dockerfile(self):
         with open(f"{self.workspace_path}/Dockerfile", "w") as dockerfile:
             lines = [
                 f"FROM {self.base_image}",
-                ds.install_packages(["python3-pip", "wget", "ranger", "git"]),
+                ds.install_packages(["python3-pip", "wget", "ranger", "git", "libxrender1", "libxtst6", "libxi6"]),
                 ds.create_user(self.user),
                 ds.source_ros_in_user(self.user, self.distro),
                 ds.grafical_support(),
@@ -43,7 +59,7 @@ class Workspace:
             ]
             dockerfile.writelines(lines)
 
-    def create_startup(self):
+    def create_startup(self, command="bash"):
         with open(f"{self.workspace_path}/startup.sh", "w") as startup:
             lines = (
                 f"docker run -it --privileged "
@@ -60,42 +76,12 @@ class Workspace:
                 f"--network host "
                 f"--rm "
                 f"{self.image_name} "
-                f"bash"
+                f"{command}"
             )
             startup.writelines(lines)
 
     def run_workspace(self):
         os.system(f"bash {self.workspace_path}/startup.sh")
-
-    def run_workspace_docker(self):
-        client = docker.from_env()
-
-        command = "bash"
-
-        volumes = {
-            "/dev": {"bind": "/dev", "mode": "rw"},
-            f"{self.workspace_path}/shared": {"bind": f"/home/{self.user}/shared", "mode": "rw"},
-            f"{self.workspace_path}/settings/config": {"bind": f"/home/{self.user}/.config", "mode": "rw"},
-            f"{self.workspace_path}/settings/cache": {"bind": f"/home/{self.user}/.cache", "mode": "rw"},
-            f"{self.workspace_path}/settings/local": {"bind": f"/home/{self.user}/.local", "mode": "rw"},
-            f"{self.workspace_path}/settings/java": {"bind": f"/home/{self.user}/.java", "mode": "rw"},
-        }
-
-        network_mode = "host"
-
-        container = client.containers.run(
-            image=self.image_name,
-            command=command,
-            name=self.workspace_name,
-            user=self.user,
-            working_dir=f"/home/{self.user}",
-            environment=["DISPLAY=$DISPLAY"],
-            volumes=volumes,
-            network_mode=network_mode,
-            remove=True,
-            privileged=True,
-            tty=True
-        )
 
     def build_image(self):
         client = docker.from_env()
@@ -104,6 +90,9 @@ class Workspace:
 
 if __name__ == '__main__':
     w = Workspace("test", "test", "noetic", "ros:noetic", "pycharm-professional")
+    print("Creating workspace...")
     w.create_workspace()
+    print("Building image...")
     w.build_image()
-    w.run_workspace_docker()
+    print("Running workspace...")
+    w.run_workspace()
