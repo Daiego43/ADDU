@@ -10,7 +10,8 @@ WORKSPACES_PATH = CONFIG['addu-workspaces-path']
 class Workspace:
     def __init__(self, workspace_name=None, user=None, distro=None, base_image=None, editor=None):
         self.workspace_name = workspace_name
-        self.workspace_path = f"{WORKSPACES_PATH}/{workspace_name}"
+        self.workspace_path = os.path.expanduser(f"{WORKSPACES_PATH}/{workspace_name}")
+        print(self.workspace_path)
         self.user = user
         self.distro = distro
         self.base_image = base_image
@@ -90,9 +91,4 @@ class Workspace:
 
 if __name__ == '__main__':
     w = Workspace("test", "test", "noetic", "ros:noetic", "pycharm-professional")
-    print("Creating workspace...")
-    w.create_workspace()
-    print("Building image...")
-    w.build_image()
-    print("Running workspace...")
-    w.run_workspace()
+
