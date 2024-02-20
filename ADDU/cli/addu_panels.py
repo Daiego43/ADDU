@@ -8,14 +8,16 @@ from rich.prompt import Prompt
 from rich.text import Text
 from rich.table import Table
 
-
 from pathlib import Path
 
-config_path = Path("config") / "config.yaml"
+current_file_path = Path(__file__).parent
+config_path = current_file_path / ".." / "config" / "config.yaml"
+config_path = config_path.resolve()
 
 CONFIG = yaml.load(open(config_path, "r"), Loader=yaml.FullLoader)
-if not os.path.exists(CONFIG["addu-workspaces-path"]):
-    os.makedirs(CONFIG["addu-workspaces-path"])
+workspaces_path = Path(CONFIG["addu-workspaces-path"]).expanduser()
+if not os.path.exists(workspaces_path):
+    os.makedirs(workspaces_path)
 
 
 def about_panel():
@@ -62,14 +64,14 @@ def workspace_creation_panel(console):
     editor = config["supported-editors"][int(editor)]
     image = config["ros-distros"][distro][int(image)]
     console.clear()
-    print(editor)
     return ws_name, image, user, distro, editor
 
 
 def list_workspaces():
     title = Text("Workspaces", "bold")
     subtitle = Text("Workspaces", "bold")
-    workspaces = os.listdir(CONFIG["addu-workspaces-path"])
+    workspaces_path = Path(CONFIG["addu-workspaces-path"]).expanduser()
+    workspaces = os.listdir(workspaces_path)
     table = Table()
     table.add_column("ID", style="cyan")
     table.add_column("Workspace", style="magenta")
@@ -80,7 +82,7 @@ def list_workspaces():
         return Panel.fit("No workspaces found!", title=title, border_style="blue", subtitle=subtitle, padding=(1, 2))
 
     for i, ws in enumerate(workspaces):
-        ws_config = yaml.load(open(f"{CONFIG['addu-workspaces-path']}/{ws}/config.yaml", "r"), Loader=yaml.FullLoader)
+        ws_config = yaml.load(open(f"{workspaces_path}/{ws}/config.yaml", "r"), Loader=yaml.FullLoader)
         table.add_row(str(i), ws, ws_config["distro"], ws_config["user"], ws_config["base_image"])
 
     return Panel.fit(table, title=title, border_style="blue", subtitle=subtitle, padding=(1, 2))
@@ -88,27 +90,23 @@ def list_workspaces():
 
 def delete_workspace(console):
     list_panel = list_workspaces()
-    workspaces = os.listdir(CONFIG["addu-workspaces-path"])
+    workspaces_path = Path(CONFIG["addu-workspaces-path"]).expanduser()
+    workspaces = os.listdir(workspaces_path)
     console.print(list_panel)
     if not workspaces:
         return
     i = Prompt.ask("Enter the workspace id you want to delete", choices=[str(i) for i in range(len(workspaces))])
-    path = CONFIG["addu-workspaces-path"] + "/" + workspaces[int(i)]
+    path = workspaces_path / workspaces[int(i)]
     shutil.rmtree(path)
 
 
 def run_workspace(console):
     list_panel = list_workspaces()
-    workspaces = os.listdir(CONFIG["addu-workspaces-path"])
+    workspaces_path = Path(CONFIG["addu-workspaces-path"]).expanduser()
+    workspaces = os.listdir(workspaces_path)
     console.print(list_panel)
     if not workspaces:
         return
     i = Prompt.ask("Enter the workspace id you want to run", choices=[str(i) for i in range(len(workspaces))])
     ws = workspaces[int(i)]
-    os.system(f"bash {CONFIG['addu-workspaces-path']}/{ws}/startup.sh")
-
-
-if __name__ == '__main__':
-    console = Console()
-    workspace_creation_panel(console)
-    print("Done")
+    os.system(f"bash {workspaces_path}/{ws}/startup.sh")

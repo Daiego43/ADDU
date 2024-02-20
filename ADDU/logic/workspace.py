@@ -1,16 +1,20 @@
 import yaml
 import os
-from logic import docker_snippets as ds
+from ADDU.logic import docker_snippets as ds
 import docker
+from pathlib import Path
 
-CONFIG = yaml.safe_load(open('config/config.yaml'))
-WORKSPACES_PATH = CONFIG['addu-workspaces-path']
+current_file_path = Path(__file__).parent
+config_path = current_file_path / ".." / "config" / "config.yaml"
+config_path = config_path.resolve()
+CONFIG = yaml.safe_load(open(config_path, "r"))
+WORKSPACES_PATH = Path(CONFIG["addu-workspaces-path"]).expanduser()
 
 
 class Workspace:
     def __init__(self, workspace_name=None, user=None, distro=None, base_image=None, editor=None):
         self.workspace_name = workspace_name
-        self.workspace_path = os.path.expanduser(f"{WORKSPACES_PATH}/{workspace_name}")
+        self.workspace_path = str(WORKSPACES_PATH / workspace_name)
         print(self.workspace_path)
         self.user = user
         self.distro = distro
@@ -91,4 +95,3 @@ class Workspace:
 
 if __name__ == '__main__':
     w = Workspace("test", "test", "noetic", "ros:noetic", "pycharm-professional")
-
