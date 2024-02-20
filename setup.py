@@ -1,8 +1,8 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='ADDU',
-    version='1.0.0',
+    name='addu',
+    version='1.0.1',
     author='Diego Delgado Chaves',
     author_email='diedelcha@gmail.com',
     description='ADDU is a cli tool for creating and managing Dockerized ROS Environments',
