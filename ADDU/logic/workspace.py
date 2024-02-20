@@ -14,7 +14,7 @@ WORKSPACES_PATH = Path(CONFIG["addu-workspaces-path"]).expanduser()
 class Workspace:
     def __init__(self, workspace_name=None, user=None, distro=None, base_image=None, editor=None):
         self.workspace_name = workspace_name
-        self.workspace_path = WORKSPACES_PATH / workspace_name
+        self.workspace_path = str(WORKSPACES_PATH / workspace_name)
         print(self.workspace_path)
         self.user = user
         self.distro = distro
