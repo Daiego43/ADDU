@@ -14,7 +14,8 @@ ADDU is a CLI tool to build ROS dockerimages and managing docker development env
 
 
 ## Installation and requirements
-To use ADDU you must install docker and be able to use docker command without sudo
+To use ADDU you must install docker and be able to use docker command without sudo.
+
 You can install addu using pip:
 ```bash
 pip install addu 
