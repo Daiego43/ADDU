@@ -92,6 +92,10 @@ class Workspace:
         client = docker.from_env()
         client.images.build(path=self.workspace_path, tag=self.image_name, rm=True, forcerm=True)
 
+    def clean_up_build(self):
+        client = docker.from_env()
+        client.images.prune(filters={'dangling': True})
+
 
 if __name__ == '__main__':
     w = Workspace("test", "test", "noetic", "ros:noetic", "pycharm-professional")
