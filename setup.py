@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='ADDU',
-    version='0.2.0',
+    version='0.2.1',
     author='Diego Delgado Chaves',
     author_email='diedelcha@gmail.com',
     description='ADDU is a cli tool for creating and managing Dockerized ROS Environments',
@@ -10,8 +10,10 @@ setup(
     long_description_content_type='text/markdown',
     url='https://github.com/Daiego43/ADDU',
     packages=find_packages(),
+    package_data={
+        'ADDU.config': ['config.yaml']
+    },
     install_requires=[
-        # Aquí puedes listar las dependencias de tu proyecto, por ejemplo:
         'certifi>=2024.2.2',
         'charset-normalizer>=3.3.2',
         'docker>=7.0.0',
@@ -24,7 +26,6 @@ setup(
         'requests>=2.31.0',
         'rich>=13.7.0',
         'urllib3>=2.2.0'
-
     ],
     classifiers=[
         'Programming Language :: Python :: 3.10',
