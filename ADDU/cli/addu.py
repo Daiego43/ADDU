@@ -3,9 +3,9 @@ import time
 from rich.console import Console
 from rich.prompt import Prompt
 
-from cli.addu_panels import (option_panel, about_panel, workspace_creation_panel,
-                             list_workspaces, delete_workspace, run_workspace)
-from logic import workspace as ws
+from ADDU.cli.addu_panels import (option_panel, about_panel, workspace_creation_panel,
+                                  list_workspaces, delete_workspace, run_workspace)
+from ADDU.logic import workspace as ws
 
 
 def addu_cli():
@@ -48,6 +48,7 @@ def addu_cli():
             addu_cli()
         case 'exit':
             console.print("[bold green]Goodbye![/bold green]")
+
 
 if __name__ == '__main__':
     addu_cli()
