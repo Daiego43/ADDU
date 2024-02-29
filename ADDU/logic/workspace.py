@@ -3,6 +3,7 @@ import os
 from ADDU.logic import docker_snippets as ds
 import docker
 from pathlib import Path
+import json
 
 current_file_path = Path(__file__).parent
 config_path = current_file_path / ".." / "config" / "config.yaml"
@@ -41,6 +42,8 @@ class Workspace:
                 self.create_startup(command="pycharm.sh")
             case "pycharm-community":
                 self.create_startup(command="pycharm.sh")
+            case _:
+                self.create_startup()
 
     def create_config_yaml(self):
         with open(f"{self.workspace_path}/config.yaml", "w") as config:
@@ -56,7 +59,7 @@ class Workspace:
         with open(f"{self.workspace_path}/Dockerfile", "w") as dockerfile:
             lines = [
                 f"FROM {self.base_image}",
-                ds.install_packages(["python3-pip", "wget", "ranger", "git", "libxrender1", "libxtst6", "libxi6"]),
+                ds.install_packages(["python3-pip", "wget", "ranger", "git", "libxrender1", "libxtst6", "libxi6", "ffmpeg", "mpg321"]),
                 ds.create_user(self.user),
                 ds.source_ros_in_user(self.user, self.distro),
                 ds.grafical_support(),
@@ -72,7 +75,9 @@ class Workspace:
                 f"--user {self.user} "
                 f"--workdir /home/{self.user} "
                 f"--env DISPLAY=$DISPLAY "
+                f"--env PULSE_SERVER=unix:/run/user/1000/pulse/native "
                 f"--volume /dev:/dev "
+                f"--volume /run/user/$(id -u)/pulse:/run/user/1000/pulse" 
                 f"--volume {self.workspace_path}/shared:/home/{self.user}/shared "
                 f"--volume {self.workspace_path}/settings/config:/home/{self.user}/.config "
                 f"--volume {self.workspace_path}/settings/cache:/home/{self.user}/.cache "
@@ -90,7 +95,7 @@ class Workspace:
 
     def build_image(self):
         client = docker.from_env()
-        client.images.build(path=self.workspace_path, tag=self.image_name, rm=True, forcerm=True)
+        response = client.images.build(path=self.workspace_path, tag=self.image_name, rm=True, forcerm=True)
 
     def clean_up_build(self):
         client = docker.from_env()

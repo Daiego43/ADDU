@@ -3,6 +3,7 @@ supported-editors:
   - pycharm-community
   - pycharm-professional
   - vscode
+  - None
 ros-distros:
   noetic:
     - osrf/ros:noetic-desktop-full

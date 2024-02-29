@@ -1,5 +1,7 @@
 import os
 import shutil
+
+import rich.console
 import yaml
 
 from rich.console import Console
@@ -7,7 +9,6 @@ from rich.panel import Panel
 from rich.prompt import Prompt
 from rich.text import Text
 from rich.table import Table
-
 from pathlib import Path
 
 current_file_path = Path(__file__).parent
@@ -20,6 +21,22 @@ if not os.path.exists(workspaces_path):
     os.makedirs(workspaces_path)
 
 
+def option_panel():
+    opciones = Text.assemble(
+        Text("about  -  About ADDU \n", "grey"),
+        Text("create -  Create a workspace\n", "cyan"),
+        Text("list   -  List workspaces   \n", "blue"),
+        Text("run    -  Run a workspace   \n", "green"),
+        Text("export -  Export a workspace\n", "yellow"),
+        Text("import -  Import a workspace\n", "orange3"),
+        Text("delete -  Delete a workspace\n", "red"),
+        Text("exit   -  Exit ADDU cli     \n", "purple"),
+    )
+    panel = Panel.fit(opciones, title=":whale: ADDU :whale:", border_style="cyan", subtitle="A Dumb Docker User",
+                      padding=(1, 2))
+    Console().print(panel)
+
+
 def about_panel():
     titulo = Text("ADDU ", "bold")
     subtitle = "A Dumb Docker User"
@@ -30,48 +47,35 @@ def about_panel():
         Text("\n\n Maintained by: Daiego43"),
     )
     descripcion.justify = "center"
-    return Panel.fit(descripcion, title=titulo, border_style="blue", subtitle=subtitle, padding=(1, 2))
+    panel = Panel.fit(descripcion, title=titulo, border_style="blue", subtitle=subtitle, padding=(1, 2))
+    Console.print(panel)
 
 
-def option_panel():
-    opciones = Text.assemble(
-        Text("about  -  About ADDU\n", "grey"),
-        Text("create -  Create a workspace\n", "blue"),
-        Text("list   -  List workspaces\n", "bold yellow"),
-        Text("run    -  Run a workspace\n", "bold green"),
-        Text("delete -  Delete a workspace\n", "bold red"),
-        Text("exit   -  Exit ADDU cli\n", "bold purple"),
-    )
-    return Panel.fit(opciones, title=":whale: ADDU :whale:", border_style="cyan", subtitle="A Dumb Docker User",
-                     padding=(1, 2))
-
-
-def workspace_creation_panel(console):
+def workspace_creation_panel():
     config = CONFIG
     ws_name = Prompt.ask("[green]Workspace name[/green]")
     distro = Prompt.ask("[green]Choose a ROS distro[/green]", choices=config["ros-distros"].keys())
-    console.print(f"[bold green]Available images for {distro}[/bold green]")
+    Console().print(f"[bold green]Available images for {distro}[/bold green]")
     for i, image in enumerate(config["ros-distros"][distro]):
-        console.print(f" {i} - [cyan]{image}[/cyan]")
+        Console().print(f" {i} - [cyan]{image}[/cyan]")
     image = Prompt.ask("[green]Choose an image[/green]",
                        choices=[str(i) for i in range(len(config["ros-distros"][distro]))])
     user = Prompt.ask("[green]Provide a username for the image[/green]")
-    console.print(f"[bold green]Available editors[/bold green]")
+    Console().print(f"[bold green]Available editors[/bold green]")
     for i, editor in enumerate(config["supported-editors"]):
-        console.print(f" {i} - [cyan]{editor}[/cyan]")
+        Console().print(f" {i} - [cyan]{editor}[/cyan]")
     editor = Prompt.ask("[green]Choose an editor[/green]",
                         choices=[str(i) for i in range(len(config["supported-editors"]))])
     editor = config["supported-editors"][int(editor)]
     image = config["ros-distros"][distro][int(image)]
-    console.clear()
+    Console().clear()
     return ws_name, image, user, distro, editor
 
 
-def list_workspaces():
+def list_workspaces_panel():
+    workspaces = os.listdir(workspaces_path)
     title = Text("Workspaces", "bold")
     subtitle = Text("Workspaces", "bold")
-    workspaces_path = Path(CONFIG["addu-workspaces-path"]).expanduser()
-    workspaces = os.listdir(workspaces_path)
     table = Table()
     table.add_column("ID", style="cyan")
     table.add_column("Workspace", style="magenta")
@@ -85,28 +89,45 @@ def list_workspaces():
         ws_config = yaml.load(open(f"{workspaces_path}/{ws}/config.yaml", "r"), Loader=yaml.FullLoader)
         table.add_row(str(i), ws, ws_config["distro"], ws_config["user"], ws_config["base_image"])
 
-    return Panel.fit(table, title=title, border_style="blue", subtitle=subtitle, padding=(1, 2))
+    panel = Panel.fit(table, title=title, border_style="blue", subtitle=subtitle, padding=(1, 2))
+    Console().print(panel)
 
 
-def delete_workspace(console):
-    list_panel = list_workspaces()
+def run_workspace_panel():
+    list_workspaces_panel()
     workspaces_path = Path(CONFIG["addu-workspaces-path"]).expanduser()
     workspaces = os.listdir(workspaces_path)
-    console.print(list_panel)
+    if not workspaces:
+        return
+    i = Prompt.ask("Enter the workspace id you want to run", choices=[str(i) for i in range(len(workspaces))])
+    ws_name = workspaces[int(i)]
+    return ws_name
+
+
+def delete_workspace_panel():
+    list_workspaces_panel()
+    workspaces = os.listdir(workspaces_path)
     if not workspaces:
         return
     i = Prompt.ask("Enter the workspace id you want to delete", choices=[str(i) for i in range(len(workspaces))])
     path = workspaces_path / workspaces[int(i)]
-    shutil.rmtree(path)
+    return path
 
 
-def run_workspace(console):
-    list_panel = list_workspaces()
-    workspaces_path = Path(CONFIG["addu-workspaces-path"]).expanduser()
+def export_workspace_panel():
+    list_workspaces_panel()
     workspaces = os.listdir(workspaces_path)
-    console.print(list_panel)
     if not workspaces:
         return
-    i = Prompt.ask("Enter the workspace id you want to run", choices=[str(i) for i in range(len(workspaces))])
+    i = Prompt.ask("Enter the workspace id you want to export", choices=[str(i) for i in range(len(workspaces))])
     ws = workspaces[int(i)]
-    os.system(f"bash {workspaces_path}/{ws}/startup.sh")
+    return ws
+
+
+def import_workspace_panel():
+    zip_name = Prompt.ask("[bold green]Specify route to zipfile[/bold green]")
+    return zip_name
+
+
+if __name__ == '__main__':
+    rich.console.Console().print(option_panel())
