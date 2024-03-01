@@ -59,7 +59,6 @@ RUN tar -xvf pycharm-community-2023.3.3.tar.gz -C /opt/
 ENV PATH="/opt/pycharm-community-2023.3.3/bin:${{PATH}}"
 """
     else:
-        print("No editor selected, your entrypoint will be bash")
         snippet = ""
     return snippet
 
