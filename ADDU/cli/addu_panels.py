@@ -48,7 +48,7 @@ def about_panel():
     )
     descripcion.justify = "center"
     panel = Panel.fit(descripcion, title=titulo, border_style="blue", subtitle=subtitle, padding=(1, 2))
-    Console.print(panel)
+    Console().print(panel)
 
 
 def workspace_creation_panel():
