@@ -26,7 +26,7 @@ def addu_cli():
     console.clear()
     match option:
         case 'about':
-            console.print(about_panel())
+            about_panel()
             input("Enter to go back")
             console.clear()
             addu_cli()
